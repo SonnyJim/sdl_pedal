@@ -1,0 +1,7 @@
+label=CC20,cc=20,type=normal
+label=CC21,cc=21,type=toggle
+label=CC22,cc=22,type=normal
+label=CC23,cc=23,type=toggle
+label=CC24,cc=24,type=normal
+label=CC25,cc=25,type=toggle
+
