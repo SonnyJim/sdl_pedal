@@ -23,6 +23,7 @@ add_executable(sdl_pedal
     src/button.cpp
     src/slider.cpp
     src/nav.cpp
+    src/events.cpp
 )
 
 target_link_libraries(sdl_pedal
