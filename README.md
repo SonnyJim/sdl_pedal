@@ -18,3 +18,11 @@ sudo apt install -y \
   libsdl2-dev \
   libsdl2-ttf-dev \
   libasound2-dev
+```
+## Build
+```
+mkdir build
+cd build
+cmake ../
+make
+```
