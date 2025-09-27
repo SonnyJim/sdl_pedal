@@ -1,7 +1,2 @@
-label=CC20,cc=20,type=normal
-label=CC21,cc=21,type=toggle
-label=CC22,cc=22,type=normal
-label=CC23,cc=23,type=toggle
-label=CC24,cc=24,type=normal
-label=CC25,cc=25,type=toggle
-
+label=REC,cc=20,type=toggle,page=0,x=0,y=0
+label=Volume,cc=7,type=slider,page=1,x=100,y=100
