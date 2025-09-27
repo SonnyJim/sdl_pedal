@@ -1,3 +1,5 @@
 label=REC,cc=20,type=toggle,page=0,x=0,y=0
+label=Met,cc=21,type=toggle,page=0,x=80,y=0
+label=Reboot,type=cmd,cmd=sudo reboot,page=2,x=10,y=60
 label=Volume,cc=7,type=slider,page=1,x=100,y=100
 label=Slider2,cc=9,type=slider,page=1,x=100,y=200

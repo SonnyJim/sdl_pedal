@@ -4,6 +4,8 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <cstdlib>   // std::system
+#include <thread>    // std::thread
 
 // --- helper functions for buttons ---
 static bool handle_single_button(Button& b, int current_page, SDL_Event &e){
@@ -13,21 +15,35 @@ static bool handle_single_button(Button& b, int current_page, SDL_Event &e){
         if(b.page==current_page &&
            mx>=b.rect.x && mx<b.rect.x+b.rect.w &&
            my>=b.rect.y && my<b.rect.y+b.rect.h){
-            if(b.toggle){ 
-                b.state=!b.state; 
-                send_cc(b.cc,b.state?127:0); 
-                dirty=true; 
+
+            if(b.type=="toggle"){
+                b.state=!b.state;
+                send_cc(b.cc,b.state?127:0);
+                dirty=true;
             }
-            else if(!b.pressed){ 
-                b.pressed=true; 
-                send_cc(b.cc,127); 
-                dirty=true; 
+            else if(b.type=="cmd"){
+                if(!b.cmd.empty()){
+                    // run asynchronously to avoid freezing UI
+                    std::thread([cmd=b.cmd](){
+                        std::system(cmd.c_str());
+                    }).detach();
+                    dirty=true;
+                } else {
+                    //send_cmd(b.cc);
+		    //TODO Print an error or something
+                    dirty=true;
+                }
+            }
+            else if(!b.pressed){
+                b.pressed=true;
+                send_cc(b.cc,127);
+                dirty=true;
             }
         }
     } else if(e.type==SDL_MOUSEBUTTONUP){
-        if(b.page==current_page && !b.toggle && b.pressed){ 
-            b.pressed=false; 
-            send_cc(b.cc,0); 
+        if(b.page==current_page && b.type=="button" && b.pressed){
+            b.pressed=false;
+            send_cc(b.cc,0);
             dirty=true;
         }
     }
@@ -37,9 +53,11 @@ static bool handle_single_button(Button& b, int current_page, SDL_Event &e){
 static void draw_single_button(SDL_Renderer* renderer, TTF_Font* font, const Button& b, int current_page){
     if(b.page!=current_page) return;
 
-    // color based on state
-    if(b.toggle){
+    // color based on type/state
+    if(b.type=="toggle"){
         SDL_SetRenderDrawColor(renderer, b.state?0:200, b.state?200:0, 0, 255);
+    } else if(b.type=="cmd"){
+        SDL_SetRenderDrawColor(renderer, 0, 128, 255, 255); // blue for cmd
     } else {
         SDL_SetRenderDrawColor(renderer, b.pressed?0:200, b.pressed?200:0, 0, 255);
     }
@@ -80,7 +98,8 @@ std::vector<Control> load_controls(const std::string& filename) {
         int page=0;
         std::string type="button";
         bool toggle=false;
-        int x=-1, y=-1;   // optional coordinates
+        int x=-1, y=-1;
+        std::string cmd;
 
         std::stringstream ss(line);
         std::string token;
@@ -95,9 +114,10 @@ std::vector<Control> load_controls(const std::string& filename) {
             else if(key=="page") page=std::stoi(val);
             else if(key=="x") x=std::stoi(val);
             else if(key=="y") y=std::stoi(val);
+            else if(key=="cmd") cmd=val;
         }
 
-        if(cc==-1){ std::cerr<<"Missing CC in line: "<<line<<std::endl; exit(1);}
+        if(cc==-1 && type!="cmd"){ std::cerr<<"Missing CC in line: "<<line<<std::endl; exit(1);}
         if(label.empty()) label="CC"+std::to_string(cc);
         if(type=="toggle") toggle=true;
 
@@ -108,15 +128,15 @@ std::vector<Control> load_controls(const std::string& filename) {
         if(type=="slider"){
             c.is_slider = true;
             c.slider = { {px,py,200,20}, {px,py,10,20}, cc, 0, false, page };
-	    c.button.label = label;
+            c.button.label = label;
         } else {
             c.is_slider = false;
-            c.button = { {px,py,80,40}, label, cc, false, toggle, false, page, false };
+            c.button = { {px,py,80,40}, label, cc, false, toggle, false, page, false, type, cmd };
         }
 
         controls.push_back(c);
 
-        if(x<0) { // only advance auto layout if user didn't specify coordinates
+        if(x<0){ // only advance auto layout if user didn't specify coordinates
             auto_x += (c.is_slider?220:90);
             if(auto_x + 90 > SCREEN_WIDTH){
                 auto_x = 10;
