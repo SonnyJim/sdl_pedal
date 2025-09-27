@@ -4,25 +4,34 @@
 #include <SDL2/SDL_ttf.h>
 #include <iostream>
 
-bool handle_slider_event(Slider &s, int current_page, SDL_Event &e){
+bool handle_slider_event(Slider &s, int current_page, SDL_Event &e) {
     if(s.page != current_page) return false;
 
     bool dirty = false;
-    if(e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEMOTION){
-        int mx = (e.type==SDL_MOUSEMOTION)? e.motion.x : e.button.x;
-        int my = (e.type==SDL_MOUSEMOTION)? e.motion.y : e.button.y;
+    if(e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEMOTION) {
+        int mx = (e.type==SDL_MOUSEMOTION) ? e.motion.x : e.button.x;
+        int my = (e.type==SDL_MOUSEMOTION) ? e.motion.y : e.button.y;
 
-        bool left_pressed = (e.type==SDL_MOUSEBUTTONDOWN)? true : (e.motion.state & SDL_BUTTON(SDL_BUTTON_LEFT));
+        bool left_pressed =
+            (e.type == SDL_MOUSEBUTTONDOWN) ? true
+            : (e.motion.state & SDL_BUTTON(SDL_BUTTON_LEFT));
+
         if(!left_pressed) return false;
 
-        if(mx >= s.track.x && mx <= s.track.x + s.track.w){
+        // ✅ Check both X and Y bounds
+        if(mx >= s.track.x && mx <= s.track.x + s.track.w &&
+           my >= s.track.y && my <= s.track.y + s.track.h) 
+        {
             int old_value = s.value;
             float ratio = float(mx - s.track.x) / float(s.track.w);
             s.value = int(ratio * 127);
-            if(s.value != old_value){
+
+            if(s.value != old_value) {
                 dirty = true;
                 send_cc(s.cc, s.value);
-                std::cout << "Slider CC=" << s.cc << " value=" << s.value << " (mx=" << mx << ")\n";
+                std::cout << "Slider CC=" << s.cc
+                          << " value=" << s.value
+                          << " (mx=" << mx << ", my=" << my << ")\n";
             }
         }
     }

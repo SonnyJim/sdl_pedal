@@ -1,2 +1,3 @@
 label=REC,cc=20,type=toggle,page=0,x=0,y=0
 label=Volume,cc=7,type=slider,page=1,x=100,y=100
+label=Slider2,cc=9,type=slider,page=1,x=100,y=200
