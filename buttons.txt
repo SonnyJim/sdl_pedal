@@ -1,5 +1,9 @@
 label=REC,cc=20,type=toggle,page=0,x=0,y=0
 label=Met,cc=21,type=toggle,page=0,x=80,y=0
+label=P1,pc=1,type=pc,page=0,x=0,y=40
+label=P2,pc=2,type=pc,page=0,x=80,y=40
+label=CC1,cc=1,type=cc,page=0,x=0,y=80
+label=CC2,cc=2,type=cc,page=0,x=80,y=80
+label=BPM,cc=9,type=slider,page=0,x=100,y=250
 label=Reboot,type=cmd,cmd=sudo reboot,page=2,x=10,y=60
 label=Volume,cc=7,type=slider,page=1,x=100,y=100
-label=Slider2,cc=9,type=slider,page=1,x=100,y=200
