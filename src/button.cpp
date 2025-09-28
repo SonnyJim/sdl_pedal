@@ -34,6 +34,10 @@ static bool handle_single_button(Button& b, int current_page, SDL_Event &e){
                     dirty=true;
                 }
             }
+	    else if (b.type=="pc"){
+		    b.pressed=true;
+		    send_pc(b.pc);
+	    }
             else if(!b.pressed){
                 b.pressed=true;
                 send_cc(b.cc,127);
@@ -96,6 +100,7 @@ std::vector<Control> load_controls(const std::string& filename) {
 
         std::string label;
         int cc=-1;
+        int pc=-1;
         int page=0;
         std::string type="button";
         bool toggle=false;
@@ -111,6 +116,7 @@ std::vector<Control> load_controls(const std::string& filename) {
             std::string val = token.substr(pos+1);
             if(key=="label") label=val;
             else if(key=="cc") cc=std::stoi(val);
+            else if(key=="pc") pc=std::stoi(val);
             else if(key=="type") type=val;
             else if(key=="page") page=std::stoi(val);
             else if(key=="x") x=std::stoi(val);
@@ -133,7 +139,7 @@ std::vector<Control> load_controls(const std::string& filename) {
             c.button.label = label;
         } else {
             c.is_slider = false;
-            c.button = { {px,py,80,40}, label, cc, false, toggle, false, page, false, type, cmd };
+            c.button = { {px,py,80,40}, label, cc, pc, false, toggle, false, page, false, type, cmd };
         }
 
         controls.push_back(c);

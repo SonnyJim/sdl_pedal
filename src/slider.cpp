@@ -25,13 +25,14 @@ bool handle_slider_event(Slider &s, int current_page, SDL_Event &e) {
             int old_value = s.value;
             float ratio = float(mx - s.track.x) / float(s.track.w);
             s.value = int(ratio * 127);
-
             if(s.value != old_value) {
                 dirty = true;
                 send_cc(s.cc, s.value);
-                std::cout << "Slider CC=" << s.cc
-                          << " value=" << s.value
-                          << " (mx=" << mx << ", my=" << my << ")\n";
+		if (verbose){
+			std::cout << "Slider CC=" << s.cc
+				  << " value=" << s.value
+				  << " (mx=" << mx << ", my=" << my << ")\n";
+		}
             }
         }
     }

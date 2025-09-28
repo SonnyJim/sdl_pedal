@@ -21,11 +21,44 @@ void send_cc(int cc, int value) {
     snd_seq_ev_set_source(&ev, out_port);
     snd_seq_ev_set_subs(&ev);
     snd_seq_ev_set_direct(&ev);
+
     ev.type = SND_SEQ_EVENT_CONTROLLER;
     ev.data.control.channel = 0;
     ev.data.control.param = cc;
     ev.data.control.value = value;
-    snd_seq_event_output(seq,&ev);
+
+    snd_seq_event_output(seq, &ev);
     snd_seq_drain_output(seq);
+
+    if(verbose) {
+        std::cout << "[MIDI] Sent CC#" << cc 
+                  << " value=" << value 
+                  << " on channel "
+                  << (ev.data.control.channel == 0 ? "global" : std::to_string(ev.data.control.channel))
+                  << "\n";
+    }
+}
+
+void send_pc(int program) {
+    snd_seq_event_t ev;
+    snd_seq_ev_clear(&ev);
+    snd_seq_ev_set_source(&ev, out_port);
+    snd_seq_ev_set_subs(&ev);
+    snd_seq_ev_set_direct(&ev);
+
+    ev.type = SND_SEQ_EVENT_PGMCHANGE;
+    ev.data.control.channel = 0;
+    ev.data.control.value = program;
+
+    snd_seq_event_output(seq, &ev);
+    snd_seq_drain_output(seq);
+
+    if(verbose) {
+        std::cout << "[MIDI] Sent Program Change "
+                  << program
+                  << " on channel "
+                  << (ev.data.control.channel == 0 ? "global" : std::to_string(ev.data.control.channel))
+                  << "\n";
+    }
 }
 
