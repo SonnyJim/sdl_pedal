@@ -41,9 +41,10 @@ static bool handle_single_button(Button& b, int current_page, SDL_Event &e){
             }
         }
     } else if(e.type==SDL_MOUSEBUTTONUP){
-        if(b.page==current_page && b.type=="button" && b.pressed){
+        if(b.page==current_page && b.pressed){
             b.pressed=false;
-            send_cc(b.cc,0);
+	    if (b.type=="button")
+            	send_cc(b.cc,0);
             dirty=true;
         }
     }
@@ -117,7 +118,8 @@ std::vector<Control> load_controls(const std::string& filename) {
             else if(key=="cmd") cmd=val;
         }
 
-        if(cc==-1 && type!="cmd"){ std::cerr<<"Missing CC in line: "<<line<<std::endl; exit(1);}
+        //if(cc==-1 && type!="cmd"){ std::cerr<<"Missing CC in line: "<<line<<std::endl; exit(1);}
+	//TODO Some error checking would be nice
         if(label.empty()) label="CC"+std::to_string(cc);
         if(type=="toggle") toggle=true;
 
